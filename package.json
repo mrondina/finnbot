@@ -1,0 +1,28 @@
+{
+  "name": "finnbot",
+  "version": "1.0.0",
+  "description": "an AdventureTime fan project",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "request": "^2.74.0"
+  },
+  "engines": {
+    "node": "4.4.7"
+  }
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrondina/finnbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrondina/finnbot/issues"
+  },
+  "homepage": "https://github.com/mrondina/finnbot#readme"
+}
