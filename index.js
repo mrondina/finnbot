@@ -3,12 +3,19 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
+var Config = require('./config')
+var FB = require('./connectors/facebook')
+var Bot = require('./bot')
+
+//The Server side
 const app = express()
 
 app.set('port', (process.env.PORT || 5000))
 
+/*
 //Process application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}))
+*/
 
 //Process application json
 app.use(bodyParser.json())
@@ -20,7 +27,7 @@ app.get('/', function(req, res) {
 
 // for Facebook's verification
 app.get('/webhook/', function(req, res) {
-	if(req.query['hub.verify_token'] === 'glob_verify_my_access') {
+	if(req.query['hub.verify_token'] === Config.FB_VERIFY_TOKEN) {
 		res.send(req.query['hub.challenge'])
 	}
 	res.send('Error, wrong token')
@@ -31,14 +38,18 @@ app.listen(app.get('port'), function() {
 	console.log('running on port', app.get('port'))
 })
 
-app.post('/webhook/', function(req, res) {
-	let messaging_events = req.body.entry[0].messaging
-	for(let i=0; i < messaging_events.length; i++) {
-		let event = req.body.entry[0].messaging[i]
-		let sender = event.sender.id
-		if(event.message && event.message.text) {
-			let text = event.message.text
-			sendTextMessage(sender, "Yeah, boi! I hear you say: " + text.substring(0, 200))
+app.post('/webhooks/', function(req, res) {
+	var entry = FB.getMessageEntry(req.body)
+	// validate the message
+	if(entry && entry.message) {
+		if(entry.message.attachments) {
+			// message attachments to be built out later, but have a default for it
+			FB.newMessage(entry.sender.id, "Sweet! Wish I could see it, tho. I'm not that advanced, you know?")
+		} else {
+			// send it out for the bot to process
+			Bot.read(entry.sender.id, entry.message.text, function(sender, reply) {
+				FB.newMessage(sender, reply)
+			})
 		}
 	}
 	res.sendStatus(200)
@@ -46,6 +57,7 @@ app.post('/webhook/', function(req, res) {
 
 const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
 
+/*
 function sendTextMessage(sender, text) {
 	let messageData = { text:text }
 	request({
@@ -64,4 +76,4 @@ function sendTextMessage(sender, text) {
 		}
 	})
 }
-
+*/

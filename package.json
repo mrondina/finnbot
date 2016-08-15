@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/mrondina/finnbot.git"
   },
-  "author": "",
+  "author": "Mark Rondina",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/mrondina/finnbot/issues"
