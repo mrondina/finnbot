@@ -39,6 +39,16 @@ app.listen(app.get('port'), function() {
 })
 
 app.post('/webhook', function(req, res) {
+	let message_events = req.body.entry[0].messaging
+	for(let i = 0; i < messaging.events.length; i++) {
+		let event = req.body.entry[0].messaging[i]
+		let sender = event.sender.id
+		if(event.message && event.message.text) {
+			let text = event.message.text
+			sendTextMessage(sender, "Said yo mama, yo mama, she said: " + text.substring(0,200))
+		}
+	}
+	/*
 	var entry = FB.getMessageEntry(req.body)
 	// validate the message
 	if(entry && entry.message) {
@@ -52,6 +62,7 @@ app.post('/webhook', function(req, res) {
 			})
 		}
 	}
+	*/
 	res.sendStatus(200)
 })
 
