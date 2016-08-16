@@ -39,13 +39,11 @@ app.listen(app.get('port'), function() {
 })
 
 app.post('/webhook', function(req, res) {
-	let message_events = req.body.entry[0].messaging
-	for(let i = 0; i < messaging.events.length; i++) {
-		let event = req.body.entry[0].messaging[i]
-		let sender = event.sender.id
+	var events = req.body.entry[0].messaging;
+	for(i = 0; i < events.length; i++) {
+		var event = events[i];
 		if(event.message && event.message.text) {
-			let text = event.message.text
-			sendTextMessage(sender, "Said yo mama, yo mama, she said: " + text.substring(0,200))
+			sendTextMessage(event.sender.id, {text:"Said yo mama, yo mama, she said: " + event.message.text});
 		}
 	}
 	/*
@@ -69,15 +67,14 @@ app.post('/webhook', function(req, res) {
 const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
 
 
-function sendTextMessage(sender, text) {
-	let messageData = { text:text }
+function sendTextMessage(receipientId, message) {
 	request({
 		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: ( access_token:token ),
+		qs: ( access_token: process.env.PAGE_ACCESS_TOKEN),
 		method: 'POST',
 		json: {
-			recipient: {id:sender},
-			message: messageData,
+			recipient: {id:recipientId},
+			message: message,
 		}
 	}, function(error, response, body) {
 		if(error) {
