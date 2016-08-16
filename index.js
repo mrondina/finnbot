@@ -26,7 +26,7 @@ app.get('/', function(req, res) {
 })
 
 // for Facebook's verification
-app.get('/webhook/', function(req, res) {
+app.get('/webhook', function(req, res) {
 	if(req.query['hub.verify_token'] === Config.FB_VERIFY_TOKEN) {
 		res.send(req.query['hub.challenge'])
 	}
@@ -38,7 +38,7 @@ app.listen(app.get('port'), function() {
 	console.log('running on port', app.get('port'))
 })
 
-app.post('/webhook/', function(req, res) {
+app.post('/webhook', function(req, res) {
 	var entry = FB.getMessageEntry(req.body)
 	// validate the message
 	if(entry && entry.message) {
