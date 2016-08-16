@@ -38,7 +38,7 @@ app.listen(app.get('port'), function() {
 	console.log('running on port', app.get('port'))
 })
 
-app.post('/webhooks/', function(req, res) {
+app.post('/webhook/', function(req, res) {
 	var entry = FB.getMessageEntry(req.body)
 	// validate the message
 	if(entry && entry.message) {
