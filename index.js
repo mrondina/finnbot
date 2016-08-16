@@ -8,22 +8,22 @@ const request = require('request')
 //var Bot = require('./bot')
 
 //The Server side
-const app = express()
+const app = express();
 
-app.set('port', (process.env.PORT || 5000))
+app.set('port', (process.env.PORT || 5000));
 
 
 //Process application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 //Process application json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // Index routing
 app.get('/', function(req, res) {
 	res.send('Hey there, I am Finn the Robot')
-})
+});
 
 // for Facebook's verification
 app.get('/webhook', function(req, res) {
@@ -31,12 +31,12 @@ app.get('/webhook', function(req, res) {
 		res.send(req.query['hub.challenge'])
 	}
 	res.send('Error, wrong token')
-})
+});
 
-// spin up the server to listen
-app.listen(app.get('port'), function() {
-	console.log('running on port', app.get('port'))
-})
+// // spin up the server to listen
+// app.listen(app.get('port'), function() {
+// 	console.log('running on port', app.get('port'))
+// })
 
 app.post('/webhook', function(req, res) {
 	var events = req.body.entry[0].messaging;
