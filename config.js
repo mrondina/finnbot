@@ -5,7 +5,7 @@ if(!WIT_TOKEN) {
 	throw new Error('Missing WIT_TOKEN. Go to https://wit.ai/docs/quickstart to get one.')
 }
 
-var FB_PAGE_TOKEN = "EAACRdZCXOqCIBAKxxLlANtU1RbmAo4sos2Bqsq2liYgx1jspZBugPr1Yjzga4xfeKSSh7UgnecTzC8Cjzwb0DsZAlKcUROn8KvFmrJbUQKZA1XONJ1WDk4KMBM9kMbZCPNAAuywGDHes7zvxM68EoDxCoofi7PagkCKlmEjIpowZDZD"
+var FB_PAGE_TOKEN = "EAACRdZCXOqCIBAK6osAXHiteJGy5JrLKuISyljX3ZCUsPhV5vFlqml0Rmtzy67W3GMnzf5znjZCx4O6Hs2adZAjIJJAoTV8w7f9ieocNnNvhwSd2DAXf4qEOWQdYZC16p2ZCHddP8NptBwZCqEsXgPj6IIXQD5yKPY8hGVhAtMJiwZDZD"
 if(!FB_PAGE_TOKEN) {
 	throw new Error('Missing FB_PAGE_TOKEN. Go to https://developers.facebook.com/docs/pages/access-tokens to get one.')
 }
