@@ -1,87 +1,56 @@
-'use strict'
+var express = require('express');
+var bodyParser = require('body-parser');
+var request = require('request');
+var app = express();
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const request = require('request')
-//var Config = require('./config')
-//var FB = require('./connectors/facebook')
-//var Bot = require('./bot')
-
-//The Server side
-const app = express();
-
-app.set('port', (process.env.PORT || 5000));
-
-
-//Process application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
-
-
-//Process application json
 app.use(bodyParser.json());
+app.listen((process.env.PORT || 3000));
 
-// Index routing
-app.get('/', function(req, res) {
-	res.send('Hey there, I am Finn the Robot')
+// Server frontpage
+app.get('/', function (req, res) {
+    res.send('This is TestBot Server');
 });
 
-// for Facebook's verification
-app.get('/webhook', function(req, res) {
-	if(req.query['hub.verify_token'] === 'glob_verify_my_access') {
-		res.send(req.query['hub.challenge'])
-	}
-	res.send('Error, wrong token')
+// Facebook Webhook
+app.get('/webhook', function (req, res) {
+    if (req.query['hub.verify_token'] === 'testbot_verify_token') {
+        res.send(req.query['hub.challenge']);
+    } else {
+        res.send('Invalid verify token');
+    }
 });
 
-// // spin up the server to listen
-// app.listen(app.get('port'), function() {
-// 	console.log('running on port', app.get('port'))
-// })
+// handler receiving messages
+app.post('/webhook', function (req, res) {
+    var events = req.body.entry[0].messaging;
+    for (i = 0; i < events.length; i++) {
+        var event = events[i];
+        if (event.message && event.message.text) {
+            sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
+        }
+    }
+    res.sendStatus(200);
+});
 
-app.post('/webhook', function(req, res) {
-	var events = req.body.entry[0].messaging;
-	for(i = 0; i < events.length; i++) {
-		var event = events[i];
-		if(event.message && event.message.text) {
-			sendTextMessage(event.sender.id, {text:"Said yo mama, yo mama, she said: " + event.message.text});
-		}
-	}
-	/*
-	var entry = FB.getMessageEntry(req.body)
-	// validate the message
-	if(entry && entry.message) {
-		if(entry.message.attachments) {
-			// message attachments to be built out later, but have a default for it
-			FB.newMessage(entry.sender.id, "Sweet! Wish I could see it, tho. I'm not that advanced, you know?")
-		} else {
-			// send it out for the bot to process
-			Bot.read(entry.sender.id, entry.message.text, function(sender, reply) {
-				FB.newMessage(sender, reply)
-			})
-		}
-	}
-	*/
-	res.sendStatus(200)
-})
-
-const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
+// const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
 
 
-function sendTextMessage(receipientId, message) {
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: ( access_token: process.env.PAGE_ACCESS_TOKEN),
-		method: 'POST',
-		json: {
-			recipient: {id:recipientId},
-			message: message,
-		}
-	}, function(error, response, body) {
-		if(error) {
-			console.log('Error sending messages', error)
-		} else if(response.body.error) {
-			console.log('Error: ', response.body.error)
-		}
-	})
-}
-
+// generic function sending messages
+function sendMessage(recipientId, message) {
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+        method: 'POST',
+        json: {
+            recipient: {id: recipientId},
+            message: message,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('Error sending message: ', error);
+        } else if (response.body.error) {
+            console.log('Error: ', response.body.error);
+        }
+    });
+};
