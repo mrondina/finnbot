@@ -9,7 +9,7 @@ var Config = require('./config')
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.listen(process.env.PORT || 3000);
+app.listen((process.env.PORT || 3000);
 
 // Server frontpage
 app.get('/', function (req, res) {
