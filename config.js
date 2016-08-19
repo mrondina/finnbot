@@ -14,7 +14,7 @@ var FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || 'glob_verify_my_access'
 
 module.exports = {
 	FB_PAGE_TOKEN: FB_PAGE_TOKEN,
-	FB_PAGE_ID: '',
+	FB_PAGE_ID: '548573642001582',
 	FB_VERIFY_TOKEN: FB_VERIFY_TOKEN,
 	WIT_TOKEN: WIT_TOKEN,
 }
