@@ -13,12 +13,12 @@ app.listen(process.env.PORT || 3000);
 
 // Server frontpage
 app.get('/', function (req, res) {
-    res.send('This is TestBot Server');
+    res.send('Yo! I am Finn the Robot');
 });
 
 // Facebook Webhook
 app.get('/webhook', function (req, res) {
-    if (req.query['hub.verify_token'] === 'testbot_verify_token') {
+    if (req.query['hub.verify_token'] === 'glob_verify_my_access') {
         res.send(req.query['hub.challenge']);
     } else {
         res.send('Invalid verify token');
