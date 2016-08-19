@@ -1,49 +1,61 @@
+'use strict'
 
+const express = require('express')
+const bodyParser = require('body-parser')
+const request = require('request')
+const app = express()
 
-var express = require('express');
-var bodyParser = require('body-parser');
-var request = require('request');
-var app = express();
+app.set('port', (process.env.PORT || 5000))
 
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
-app.listen((process.env.PORT || 3000));
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
+
 
 // Server frontpage
 app.get('/', function (req, res) {
-    res.send('This is Finn the Robot');
+    res.send('This is Finn the Robot')
 });
 
 // Facebook Webhook
 app.get('/webhook', function (req, res) {
     if (req.query['hub.verify_token'] === 'glob_verify_my_access') {
-        res.send(req.query['hub.challenge']);
+        res.send(req.query['hub.challenge'])
     } else {
-        res.send('Invalid verify token');
+        res.send('Invalid verify token')
     }
-});
+})
+
+// spin up the server
+app.listen(app.get('port'), function() {
+	console.log('running on port ', app.get('port'))
+})
 
 // handler receiving messages
 app.post('/webhook', function (req, res) {
-    var events = req.body.entry[0].messaging;
-    for (i = 0; i < events.length; i++) {
-        var event = events[i];
+    let messaging_events = req.body.entry[0].messaging
+    for (let i = 0; i < messaging_events.length; i++) {
+        let event = req.body.entry[0].messaging[i]
+        let sender = event.sender.id
         if (event.message && event.message.text) {
-            sendMessage(event.sender.id, {text: "Said yo mama, yo mama she said: " + event.message.text});
+        	let text = event.message.text
+            sendMessage(sender, "Said yo mama, yo mama she said: " + text.substring(0,200))
         }
     }
-    res.sendStatus(200);
-});
+    res.sendStatus(200)
+})
+
+const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
 
 // generic function sending messages
 function sendMessage(recipientId, message) {
+	let messageData = { text:text }
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+        qs: {access_token: token},
         method: 'POST',
         json: {
             recipient: {id: recipientId},
-            message: message,
+            message: messageData,
         }
     }, function(error, response, body) {
         if (error) {
