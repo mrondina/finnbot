@@ -38,7 +38,7 @@ app.post('/webhook', function (req, res) {
         let sender = event.sender.id
         if (event.message && event.message.text) {
         	let text = event.message.text
-            sendMessage(sender, "Said yo mama, yo mama she said: " + text.substring(0,200))
+            sendTextMessage(sender, "Said yo mama, yo mama she said: " + text.substring(0,200))
         }
     }
     res.sendStatus(200)
@@ -46,22 +46,21 @@ app.post('/webhook', function (req, res) {
 
 const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
 
-// generic function sending messages
-function sendMessage(recipientId, message) {
-	let messageData = { text:text }
+function sendTextMessage(sender, text) {
+    let messageData = { text:text }
     request({
         url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {access_token: token},
+        qs: {access_token:token},
         method: 'POST',
         json: {
-            recipient: {id: recipientId},
+            recipient: {id:sender},
             message: messageData,
         }
     }, function(error, response, body) {
         if (error) {
-            console.log('Error sending message: ', error);
+            console.log('Error sending messages: ', error)
         } else if (response.body.error) {
-            console.log('Error: ', response.body.error);
+            console.log('Error: ', response.body.error)
         }
-    });
-};
+    })
+}
