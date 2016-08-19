@@ -1,66 +1,174 @@
 'use strict'
 
-const express = require('express')
+const config = require('./config')
 const bodyParser = require('body-parser')
+const express = require('express')
 const request = require('request')
-const app = express()
 
-app.set('port', (process.env.PORT || 5000))
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
-
-
-// Server frontpage
-app.get('/', function (req, res) {
-    res.send('This is Finn the Robot')
-});
-
-// Facebook Webhook
-app.get('/webhook', function (req, res) {
-    if (req.query['hub.verify_token'] === 'glob_verify_my_access') {
-        res.send(req.query['hub.challenge'])
-    } else {
-        res.send('Invalid verify token')
-    }
-})
-
-// spin up the server
-app.listen(app.get('port'), function() {
-	console.log('running on port ', app.get('port'))
-})
-
-// handler receiving messages
-app.post('/webhook', function (req, res) {
-    let messaging_events = req.body.entry[0].messaging
-    for (let i = 0; i < messaging_events.length; i++) {
-        let event = req.body.entry[0].messaging[i]
-        let sender = event.sender.id
-        if (event.message && event.message.text) {
-        	let text = event.message.text
-            sendTextMessage(sender, "Said yo mama, yo mama she said: " + text.substring(0,200))
-        }
-    }
-    res.sendStatus(200)
-})
-
-const token = "EAACRdZCXOqCIBABrn9QnRA360g0cX8gs6Dfa52R34DH60wZA5yklHvZBFYpkqZAGOr4mMxqBIRoKA0kHWv0lXzQBQ8zHFg7imJOFXTGQQEZAJC6ElEFGK7tcnFRLTSg8lZABZAysv38XpDwgVZA5Hy0CRtRlReawIELS6ZBb4o1dqoAZDZD"
-
-function sendTextMessage(sender, text) {
-    let messageData = { text:text }
-    request({
-        url: 'https://graph.facebook.com/v2.6/me/messages',
-        qs: {access_token:token},
-        method: 'POST',
-        json: {
-            recipient: {id:sender},
-            message: messageData,
-        }
-    }, function(error, response, body) {
-        if (error) {
-            console.log('Error sending messages: ', error)
-        } else if (response.body.error) {
-            console.log('Error: ', response.body.error)
-        }
-    })
+// Messenger API parameters
+if (!config.FB_PAGE_TOKEN) {
+    throw new Error('missing FB_PAGE_TOKEN');
 }
+
+// set webhook reference to catch all parts of the message
+// see - https://developers.facebook.com/docs/messenger-platform/webhook-reference
+const getFirstMessageEntry = (body) => {
+	const val = body.object == 'page' &&
+	            body.entry &&
+	            Array.isArray(body.entry) &&
+	            body.entry.length > 0 &&
+	            body.entry[0] &&
+	            body.entry[0].id === config.FB_PAGE_ID &&
+	            body.entry[0].messaging &&
+	            Array.isArray(body.entry[0].messaging) &&
+	            body.entry[0].messaging.length > 0 &&
+	            body.entry[0].messaging[0];
+	return val || null;
+};
+
+var session = {};
+const findOrCreateSession = (sessions, fbid, cb) => {
+	if(!sessions[fbid]) {
+		console.log("New Session fo: ", fbid);
+		sessions[fbid] = {context:{}};
+	}
+
+	cb(sessions, fbid);
+}
+
+// WIT Ai specific code
+
+// Import our bot actions and setting it all up
+const actions = require('./wit.actions');
+const wit = new Wit(config.WIT_TOKEN, actions);
+
+// start the webserver and connecting it all together
+const app = express();
+app.set('port', PORT);
+app.listen(app.get('port'));
+app.use(bodyParser.json());
+
+
+// Facebook Webhook setup
+app.get('/webhook', (req, res) => {
+    if (!config.FB_VERIFY_TOKEN) {
+        throw new Error('missing FB_VERIFY_TOKEN');
+    } 
+    if (req.query['hub.mode'] === 'subscribe' &&
+    	req.query['hub.verify_token'] === config.FB_VERIFY_TOKEN) {
+        res.send(req.query['hub.challenge']);
+    } else {
+    	res.sendStatus(400);
+    }
+})
+
+
+// Message handler
+app.post('/', (req, res) => {
+    // Parsing the Messenger API response
+    const messaging = getFirstMessagingEntry(req.body);
+    if (messaging && messaging.recipient.id === config.FB_PAGE_ID) {
+        // Yay! We got a new message!
+
+        // We retrieve the Facebook user ID of the sender
+        const sender = messaging.sender.id;
+
+        // We retrieve the user's current session, or create one if it doesn't exist
+        // This is needed for our bot to figure out the conversation history
+        findOrCreateSession(sessions, sender, (sessions, sessionId) => {
+            // We retrieve the message content
+
+            //First do Postbacks -> then go with this context to wit.ai
+            async.series(
+                [
+                    function (callback) {
+                        if (messaging.postback) {
+                            //POSTBACK
+                            const postback = messaging.postback;
+
+                            if (postback) {
+                                var context = sessions[sessionId].context;
+                                FB.handlePostback(sessionId, context, postback.payload, (context) => {
+                                    callback(null, context);
+                                });
+                            }
+                            } else {
+                            callback(null, {});
+                        }
+                    },
+                    function (callback) {
+                        if (messaging.message) {
+                            //MESSAGE
+
+                            const msg = messaging.message.text;
+                            const atts = messaging.message.attachments;
+
+                            if (atts) {
+                                // We received an attachment
+
+                                // Let's reply with an automatic message
+                                FB.sendText(
+                                    sender,
+                                    'Sorry I can only process text messages for now.'
+                                );
+                                callback(null, {});
+
+                            } else {
+
+                                console.log("Run wit with context", sessions[sessionId].context);
+                                // Let's forward the message to the Wit.ai Bot Engine
+                                // This will run all actions until our bot has nothing left to do
+                                wit.runActions(
+                                    sessionId, // the user's current session
+                                    msg, // the user's message
+                                    sessions[sessionId].context, // the user's current session state
+                                    (error, context) => {
+                                        if (error) {
+                                            console.log('Oops! Got an error from Wit:', error);
+                                        } else {
+                                            // Our bot did everything it has to do.
+                                            // Now it's waiting for further messages to proceed.
+                                            console.log('Waiting for futher messages.');
+
+                                            // Based on the session state, you might want to reset the session.
+                                            // This depends heavily on the business logic of your bot.
+                                            // Example:
+                                            // if (context['done']) {
+                                            //   delete sessions[sessionId];
+                                            // }
+
+                                            // Updating the user's current session state
+                                            callback(null, context);
+                                        }
+                                    }
+                                );
+
+                            }
+                        } else {
+                            //delivery confirmation
+                            //mids etc
+
+                            callback(null, {});
+                            }
+                    },
+                ],
+                function (err, results) {
+
+                    /* var newContext = sessions[sessionId].context;
+                     console.log("Old context", newContext);
+                     for (let context_return of results) {
+                     newContext = newContext.concat(context_return);
+                     console.log("New after adding", context_return, newContext);
+                     }
+                     sessions[sessionId].context = newContext;*/
+
+                    console.log("Session context", sessions[sessionId].context);
+                }
+            );
+            }
+        );
+    }
+    res.sendStatus(200);
+});

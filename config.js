@@ -13,7 +13,8 @@ if(!FB_PAGE_TOKEN) {
 var FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN || 'glob_verify_my_access'
 
 module.exports = {
-	WIT_TOKEN: WIT_TOKEN,
 	FB_PAGE_TOKEN: FB_PAGE_TOKEN,
+	FB_PAGE_ID: '',
 	FB_VERIFY_TOKEN: FB_VERIFY_TOKEN,
+	WIT_TOKEN: WIT_TOKEN,
 }
