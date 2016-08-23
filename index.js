@@ -12,6 +12,7 @@ if (!config.FB_PAGE_TOKEN) {
     throw new Error('missing FB_PAGE_TOKEN');
 }
 
+
 // set webhook reference to catch all parts of the message
 // see - https://developers.facebook.com/docs/messenger-platform/webhook-reference
 const getFirstMessageEntry = (body) => {

@@ -41,18 +41,18 @@ var actions = {
 		// delete story
 
 		// store the first location the person provided
-		var loc = firstEntityValue(entities, 'location')
-		if(loc) {
-			context.loc = loc
+		var home = firstEntityValue(entities, 'home')
+		if(home) {
+			context.Ooo = home
 		}
 
 		reset the Ooo map story
 		delete context.Ooo
 
 		// retrieve the category
-		var category = firstEntityValue(entities, 'category')
-		if(category) {
-			context.cat = category
+		var family = firstEntityValue(entities, 'family')
+		if(family) {
+			context.family = family
 		}
 
 		// retrieve sentiment
@@ -72,6 +72,29 @@ var actions = {
 
 	// list of functions Wit.ai can execute
 	// leave as a placeholder for future ideas that call out to other services
+	['fetch-map'](sessionId, context, cb) {
+		// Here we can place an API call to a weather service
+		// if (context.loc) {
+		// 	getWeather(context.loc)
+		// 		.then(function (forecast) {
+		// 			context.forecast = forecast || 'sunny'
+		// 		})
+		// 		.catch(function (err) {
+		// 			console.log(err)
+		// 		})
+		// }
+
+		context.Ooo = 'Home'
+
+		cb(context)
+	},
+
+	['fetch-pics'](sessionId, context, cb) {
+		var wantedPics = allPics[context.cat || 'default']
+		context.pics = wantedPics[Math.floor(Math.random() * wantedPics.length)]
+
+		cb(context)
+	},
 
 }
 
