@@ -10,7 +10,7 @@ var findOrCreateSession = function(fbid) {
 	var sessionId
 
 	// does the session exist?
-	Object.keys(sessions).foEach(k => {
+	Object.keys(sessions).forEach(k => {
 		if(sessions[k].fbid === fbid) {
 			sessionId = k
 		}

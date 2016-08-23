@@ -39,7 +39,7 @@ var actions = {
 
 	merge(sessionId, context, entities, message, cb) {
 		// delete story
-		delete context.ooo
+		delete context.loc
 		// store the first location the person provided
 		var loc = firstEntityValue(entities, 'location')
 		if(loc) {
