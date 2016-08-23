@@ -39,18 +39,18 @@ var actions = {
 
 	merge(sessionId, context, entities, message, cb) {
 		// delete story
-
+		delete context.ooo
 		// store the first location the person provided
-		var home = firstEntityValue(entities, 'home')
-		if(home) {
-			context.Ooo = home
+		var loc = firstEntityValue(entities, 'location')
+		if(loc) {
+			context.loc = loc
 		}
 
-		reset the Ooo map story
-		delete context.Ooo
+		//reset the Ooo map story
+		delete context.family
 
 		// retrieve the category
-		var family = firstEntityValue(entities, 'family')
+		var family = firstEntityValue(entities, 'category')
 		if(family) {
 			context.family = family
 		}
