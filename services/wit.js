@@ -84,7 +84,7 @@ var actions = {
 		// 		})
 		// }
 
-		context.Ooo = 'Home'
+		context.loc = 'home'
 
 		cb(context)
 	},
@@ -131,7 +131,7 @@ var allPics = {
 		'https://media.giphy.com/media/grxSbqtDPlADm/giphy.gif',
 		'https://media.giphy.com/media/IMSq59ySKydYQ/giphy.gif',
 		],
-	Ooo: [
+	ooo: [
 		'http://vignette3.wikia.nocookie.net/adventuretimewithfinnandjake/images/7/7e/AT_earth2.jpg/revision/latest?cb=20110217221247',
 		'http://www.myteespot.com/images/Images_d/img_Mu2E0L.jpg',
 		'http://stuffpoint.com/adventure-time/image/403658-adventure-time-adventure-time-landscapes-22.jpg',
