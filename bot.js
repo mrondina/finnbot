@@ -29,41 +29,41 @@ var findOrCreateSession = function(fbid) {
 	return sessionId
 }
 
-// set up the default greeting of the bot
-var read = function(sender, message, reply) {
-	if(message === 'hello') {
-		// reply back
-		message = 'Hey there! I&#39;m Finn the Robot.'
+var read = function (sender, message, reply) {
+	if (message === 'hello') {
+		// Let's reply back hello
+		message = 'Hey there! I&#39;m Finn the Robot. You can say "show me pics of corgis"'
 		reply(sender, message)
 	} else {
-		// first find the user
+		// Let's find the user
 		var sessionId = findOrCreateSession(sender)
-		// forward the message to Wit.ai engine
-		// this runs all actions until none are left
+		// Let's forward the message to the Wit.ai bot engine
+		// This will run all actions until there are no more actions left to do
 		wit.runActions(
-			sessionId,
-			message,
-			sessions[sessionId].context, // this the user's session state
-			function(error, context) {
-				if(error) {
-					console.log('Wit says, oops! ', error)
-				} else {
-					// Wit.at has run the actions
-					// Now it is ready for more messages
-					console.log('Wit is awaiting further messages')
-					
-					// based on session state, it may need to reset the session
-					// EX:
-					// if(context['done']) {
-					//	delete sessions[sessionId]
-					// }
+			sessionId, // the user's current session by id
+			message,  // the user's message
+			sessions[sessionId].context, // the user's session state
+			function (error, context) { // callback
+			if (error) {
+				console.log('oops!', error)
+			} else {
+				// Wit.ai ran all the actions
+				// Now it needs more messages
+				console.log('Waiting for further messages')
 
-					// update user's current session state
-					sessions[sessionId].context = context
-				}
+				// Based on the session state, you might want to reset the session
+				// Example:
+				// if (context['done']) {
+				// 	delete sessions[sessionId]
+				// }
+
+				// Updating the user's current session state
+				sessions[sessionId].context = context
+			}
 		})
 	}
 }
+
 
 module.exports = {
 	findOrCreateSession: findOrCreateSession,
