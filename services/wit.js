@@ -141,7 +141,7 @@ var checkURL = function (url) {
 
 // LIST OF ALL PICS
 var allPics = {
-  ooo: [
+  corgis: [
     'http://i.imgur.com/uYyICl0.jpeg',
     'http://i.imgur.com/useIJl6.jpeg',
     'http://i.imgur.com/LD242xr.jpeg',
