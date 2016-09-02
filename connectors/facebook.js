@@ -1,7 +1,7 @@
 
 
 var request = require('request');
-var config = require('../config');
+var Config = require('../config');
 
 // SETUP A REQUEST TO FACEBOOK SERVER
 var newRequest = request.defaults({
@@ -9,7 +9,7 @@ var newRequest = request.defaults({
 	method: 'POST',
 	json: true,
 	qs: {
-		access_token: config.FB_PAGE_TOKEN
+		access_token: Config.FB_PAGE_TOKEN
 	},
 	headers: {
 		'Content-Type': 'application/json'

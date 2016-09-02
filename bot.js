@@ -1,6 +1,6 @@
 'use strict'
 
-var config = require('./config')
+var Config = require('./config')
 var wit = require('./services/wit').getWit()
 
 // Enable saving of user sessions

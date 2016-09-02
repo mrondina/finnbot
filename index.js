@@ -1,15 +1,14 @@
 'use strict'
 
+var express = require('express')
+var bodyParser = require('body-parser')
+var request = require('request')
 
-const bodyParser = require('body-parser')
-const express = require('express')
-const request = require('request')
-
-const config = require('./config')
+var config = require('./config')
 var FB = require('./connectors/facebook')
 var Bot = require('./bot')
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // let's start the server
 var app = express()
@@ -35,19 +34,20 @@ app.get('/webhook', function(req, res) {
 	res.send('Error, wrong token')
 })
 
-// send messages to facebook
-app.post('/webhook', function(req, res) {
-	var entry = FB.getMessageEntry(req.body)
-	// validate the message
-	if(entry && entry.message) {
-		if(entry.message.attachments) {
-		// not smart enough for attachments
-		FB.newMessage(entry.sender.id, "Cool! I wish I could see it, but I'm not that advanced yet")
-		} else {
-			Bot.read(entry.sender.id, entry.message.text, function(sender, reply) {
-				FB.newMessage(sender, reply)
-			})
-		}
-	}
-	res.sendStatus(200)
+// to send messages to facebook
+app.post('/webhooks', function (req, res) {
+  var entry = FB.getMessageEntry(req.body)
+  // IS THE ENTRY A VALID MESSAGE?
+  if (entry && entry.message) {
+    if (entry.message.attachments) {
+      // NOT SMART ENOUGH FOR ATTACHMENTS YET
+      FB.newMessage(entry.sender.id, "Cool! I wish I could see it, but I'm not that advanced yet")
+    } else {
+      // SEND TO BOT FOR PROCESSING
+      Bot.read(entry.sender.id, entry.message.text, function (sender, reply) {
+        FB.newMessage(sender, reply)
+      })
+    }
+  }
+  res.sendStatus(200)
 })

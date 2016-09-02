@@ -5,36 +5,38 @@ var FB = require('../connectors/facebook')
 var Wit = require('node-wit').Wit
 var request = require('request')
 
-var firstEntityValue = function(entities, entity) {
+var firstEntityValue = function (entities, entity) {
 	var val = entities && entities[entity] &&
-			  Array.isArray(entities[entity]) &&
-			  entities[entity].length > 0 &&
-			  entities[entity[0]].firstEntityValue
-		if(!val) {
-			return null
-		}
-		return typeof vall === 'object' ? val.value : val
+		Array.isArray(entities[entity]) &&
+		entities[entity].length > 0 &&
+		entities[entity][0].value
+
+	if (!val) {
+		return null
+	}
+	return typeof val === 'object' ? val.value : val
 }
 
 var actions = {
-	say(sessionId, context, message, cb) {
-		// testing mode: run cb() and return
-		if(require.main === module) {
+	say (sessionId, context, message, cb) {
+		// Bot testing mode, run cb() and return
+		if (require.main === module) {
 			cb()
 			return
 		}
 
-		console.log('WIT WANTS TO TALK TO: ', context._fbid_)
-		console.log('WIT HAS SOMETHING TO SAY: ', message)
-		console.log('WIT HAS A CONTEXT: ', context)
+		console.log('WIT WANTS TO TALK TO:', context._fbid_)
+		console.log('WIT HAS SOMETHING TO SAY:', message)
+		console.log('WIT HAS A CONTEXT:', context)
 
-		if(checkURL(message)) {
+		if (checkURL(message)) {
 			FB.newMessage(context._fbid_, message, true)
 		} else {
 			FB.newMessage(context._fbid_, message)
 		}
 
 		cb()
+		
 	},
 
 	merge(sessionId, context, entities, message, cb) {
@@ -46,13 +48,13 @@ var actions = {
 			context.loc = loc
 		}
 
-		//reset the Ooo map story
+		//reset the family story
 		delete context.family
 
 		// retrieve the category
-		var family = firstEntityValue(entities, 'category')
-		if(family) {
-			context.family = family
+		var category = firstEntityValue(entities, 'category')
+		if(category) {
+			context.cat = category
 		}
 
 		// retrieve sentiment
@@ -139,5 +141,5 @@ var allPics = {
 	default: [
 		'https://media.giphy.com/media/rOTGSPxvJJY7m/giphy.gif'
 		],
-}:
+};
 
