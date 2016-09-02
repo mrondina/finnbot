@@ -41,7 +41,7 @@ var actions = {
 
 	merge(sessionId, context, entities, message, cb) {
 		// delete story
-		delete context.loc
+		delete context.forecast
 		// store the first location the person provided
 		var loc = firstEntityValue(entities, 'location')
 		if(loc) {
@@ -49,7 +49,7 @@ var actions = {
 		}
 
 		//reset the family story
-		delete context.family
+		delete context.pics
 
 		// retrieve the category
 		var category = firstEntityValue(entities, 'category')
@@ -74,7 +74,7 @@ var actions = {
 
 	// list of functions Wit.ai can execute
 	// leave as a placeholder for future ideas that call out to other services
-	['fetch-pics'](sessionId, context, cb) {
+	['fetch-weather'](sessionId, context, cb) {
 		// Here we can place an API call to a weather service
 		// if (context.loc) {
 		// 	getWeather(context.loc)
@@ -86,7 +86,7 @@ var actions = {
 		// 		})
 		// }
 
-		context.loc = 'home'
+		context.forecast = 'Sunny'
 
 		cb(context)
 	},
