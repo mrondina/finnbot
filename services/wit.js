@@ -74,7 +74,7 @@ var actions = {
 
 	// list of functions Wit.ai can execute
 	// leave as a placeholder for future ideas that call out to other services
-	['fetch-map'](sessionId, context, cb) {
+	['fetch-pics'](sessionId, context, cb) {
 		// Here we can place an API call to a weather service
 		// if (context.loc) {
 		// 	getWeather(context.loc)
