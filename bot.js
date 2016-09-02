@@ -3,36 +3,38 @@
 var Config = require('./config')
 var wit = require('./services/wit').getWit()
 
-// Enable saving of user sessions
+// LETS SAVE USER SESSIONS
 var sessions = {}
 
-var findOrCreateSession = function(fbid) {
-	var sessionId
+var findOrCreateSession = function (fbid) {
+  var sessionId
 
-	// does the session exist?
-	Object.keys(sessions).forEach(k => {
-		if(sessions[k].fbid === fbid) {
-			sessionId = k
-		}
-	})
+  // DOES USER SESSION ALREADY EXIST?
+  Object.keys(sessions).forEach(k => {
+    if (sessions[k].fbid === fbid) {
+      // YUP
+      sessionId = k
+    }
+  })
 
-	// if there is no saved session
-	if(!sessionId) {
-		sessionId = new Date().toISOString()
-		sessions[sessionId] = {
-			fbid: fbid,
-			context: {
-				_fbid_: fbid
-			}
-		}
-	}
-	return sessionId
+  // No session so we will create one
+  if (!sessionId) {
+    sessionId = new Date().toISOString()
+    sessions[sessionId] = {
+      fbid: fbid,
+      context: {
+        _fbid_: fbid
+      }
+    }
+  }
+
+  return sessionId
 }
 
 var read = function (sender, message, reply) {
 	if (message === 'hello') {
 		// Let's reply back hello
-		message = 'Hey there! I&#39;m Finn the Robot. You can say "show me pics of corgis"'
+		message = 'Hello yourself! I am a chat bot. You can say "show me pics of corgis"'
 		reply(sender, message)
 	} else {
 		// Let's find the user
@@ -63,6 +65,7 @@ var read = function (sender, message, reply) {
 		})
 	}
 }
+
 
 
 module.exports = {
